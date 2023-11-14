@@ -1,0 +1,99 @@
+Script started on 2023-08-29 16:25:33-04:00
+bash-4.4$ uname -a
+Linux zeus-1.cec.gmu.edu 4.18.0-348.23.1.el8_5.x86_64 #1 SMP Tue Apr 12 11:20:32 EDT 2022 x86_64 x86_64 x86_64 GNU/Linux
+bash-4.4$ ls
+lab2_srhoade_214.c  lab2_typescript_srhoade_214  Makefile
+bash-4.4$ cat lab2_srhoade_214.c
+/* 
+ * Stephen Rhoades G01369048
+ * CS 262, Lab section lab214
+ * lab2: This program aims to calculate the BSA of an individual
+ *  based on user input in response to prompts. 
+ */
+
+#include <stdio.h>
+#include <math.h> 
+#define SIZE 30 
+#define V1 0.007184
+#define V2 0.425
+#define V3 0.725
+
+int main()
+{
+	char inBuff[SIZE]; /*character array(String)*/
+	float weight, height; /* weight(kg), height(cm)*/
+	double bsa; /*BSA (m^2)*/
+
+	printf("\tInput height(cm): "); /*prints the contents*/
+	fgets(inBuff, SIZE,stdin); /*gets a string from stdin and saves at inBuff array */
+	sscanf(inBuff, "%f",&height); /*copys a string from inBuff and parses a string as float value */
+
+	printf("\tInput weight(kg): ");
+	fgets(inBuff, SIZE,stdin);
+	sscanf(inBuff, "%f",&weight);
+	
+	bsa = V1 * pow(weight, V2) * pow(height, V3);
+	printf("\tThe height is: %.1f cms\n\tThe weight is: %.1f kgs\n\tBSA: %.4f meter square\n",height,weight, bsa);
+	return 0;
+}
+bash-4.4$ cat Makefile
+
+ # Stephen Rhoades G01369048
+ # CS 262, Lab section lab214
+ # lab2
+ 
+CC = gcc
+CFLAGS = -g -Wall -std=c89 -pedantic-errors
+LIBS = -lm
+
+all: lab2_srhoade_214.c
+	$(CC) lab2_srhoade_214.c -o lab2_srhoade_214 $(CFLAGS) $(LIBS)
+
+clear:
+	rm lab2_srhoade_214
+ 	
+bash-4.4$ make clear
+rm lab2_srhoade_214
+rm: cannot remove 'lab2_srhoade_214': No such file or directory
+make: *** [Makefile:14: clear] Error 1
+bash-4.4$ make all
+gcc lab2_srhoade_214.c -o lab2_srhoade_214 -g -Wall -std=c89 -pedantic-errors -lm
+bash-4.4$ ls
+lab2_srhoade_214  lab2_srhoade_214.c  lab2_typescript_srhoade_214  Makefile
+bash-4.4$ ./lab[K[K[K [Klab2_srhoade_214
+	Input height(cm): 180  50.5
+	Input weight(kg): 180.3
+	The height is: 150.5 cms
+	The weight is: 180.3 kgs
+	BSA: 2.4767 meter square
+bash-4.4$ ./lab2_srhoade_214
+	Input height(cm): 100.7
+	Input weight(kg): 167.3
+	The height is: 100.7 cms
+	The weight is: 167.3 kgs
+	BSA: 1.7929 meter square
+bash-4.4$ ./lab2_srhoade_214
+	Input height(cm): 98
+	Input weight(kg): 321   210
+	The height is: 98.0 cms
+	The weight is: 210.0 kgs
+	BSA: 1.9362 meter square
+bash-4.4$ ./lab2_srhoade_214
+	Input height(cm): 72.0
+	Input weight(kg): 168.9
+	The height is: 72.0 cms
+	The weight is: 168.9 kgs
+	BSA: 1.4115 meter square
+bash-4.4$ ./lab2_srhoade_214
+	Input height(cm): 59.9
+	Input weight(kg): 189.4
+	The height is: 59.9 cms
+	The weight is: 189.4 kgs
+	BSA: 1.2968 meter square
+bash-4.4$ make clear
+rm lab2_srhoade_214
+bash-4.4$ ls
+lab2_srhoade_214.c  lab2_typescript_srhoade_214  Makefile
+bash-4.4$ exit
+
+Script done on 2023-08-29 16:29:59-04:00
