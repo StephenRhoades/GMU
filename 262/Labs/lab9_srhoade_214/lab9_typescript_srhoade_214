@@ -1,0 +1,434 @@
+Script started on 2023-11-01 16:51:24-04:00
+bash-4.4$ uname -a
+Linux zeus-1.cec.gmu.edu 4.18.0-348.23.1.el8_5.x86_64 #1 SMP Tue Apr 12 11:20:32 EDT 2022 x86_64 x86_64 x86_64 GNU/Linux
+bash-4.4$ pwd
+/home/srhoade/CS262/lab9_srhoade_214
+bash-4.4$ ls
+lab9_srhoade_214  lab9_srhoade_214.c  lab9_typescript_srhoade_214  Makefile
+bash-4.4$ cat lab9_srhoade_214.c
+/* Stephen Rhoades G01369048
+ * CS 262, Lab Section 214
+ * Lab9: Structures and Arrays with Dynamic Memory
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#define SIZE 40
+
+
+typedef struct date {
+	int Month, Day, Year;
+} date;
+
+typedef struct employee{
+	int ID;
+	char FirstName[SIZE/2], LastName[SIZE/2];
+	date DOB;
+	double Salary;
+} employee;
+
+void printData(employee * data, int size) {
+	int i;
+	employee cur;
+	char name[SIZE], dateStr[15];
+	printf("*************************************************************\n");
+	printf("\t%-8s %-20s %-10s %-15s\n", "ID", "Name", "DOB", "Salary");
+	for (i = 0; i < size; i ++){
+		cur = *(data+i);
+		sprintf(name, "%s %s", cur.FirstName, cur.LastName);
+		sprintf(dateStr, "%d/%d/%d", cur.DOB.Month, cur.DOB.Day, cur.DOB.Year);
+		printf("\t%-8d %-20.20s %-10s %-15.2f\n", cur.ID, name , dateStr, cur.Salary);
+	}
+	printf("*************************************************************\n");
+}
+
+void printEmployee(employee data){
+	printf("*************************************************************\n");
+	printf("\tID: %d\n", data.ID);
+	printf("\tFirst Name: %s\n", data.FirstName);
+	printf("\tLast Name: %s\n", data.LastName);
+	printf("\tDOB: %d/%d/%d\n", data.DOB.Month, data.DOB.Day, data.DOB.Year);
+	printf("\tSalary: %.2f\n", data.Salary);
+	printf("*************************************************************\n");
+
+}
+
+void search(char * inBuff, employee ** emps, int size){
+	int i, ID;
+
+	printf("\n**Search For Employee Data by ID**\n");
+
+	printf("Enter employee's ID:");
+        fgets(inBuff, SIZE, stdin);
+        while(sscanf(inBuff, "%d", &ID) < 1){
+                printf("Please enter an Integer value for employee's ID:");
+                fgets(inBuff, SIZE, stdin);
+        }
+
+        for(i = 0; i < size; i++) {
+                if (ID == (*(*emps + i)).ID) {
+                       printEmployee((*(*emps + i))) ;
+		       return;
+                }
+        }
+	printf("ID Not Found\n");
+	return;
+}
+
+int insert(char * inBuff, employee ** emps, int size){
+	employee new;
+	int i;
+	
+	printf("\n**Insert Data For New Employee**\n");
+
+	printf("Enter employee's ID: ");
+	fgets(inBuff, SIZE, stdin);
+	while(sscanf(inBuff, "%d", &new.ID) < 1 || new.ID < 0){
+		if (new.ID < 0)
+			printf("ID value must be positive and less than 2147483647: ");
+		else 
+			printf("Please enter an Integer value for employee's ID: ");
+		fgets(inBuff, SIZE, stdin);
+	}
+	
+	for(i = 0; i < size; i++) {
+		if (new.ID == (*(*emps + i)).ID) {
+			printf("Error! ID is already in the database.\n");
+			printf("Returning to menu.\n");
+			return 0;
+		}
+	}
+
+	printf("Enter employee's first and last name: ");
+	fgets(inBuff, SIZE, stdin);
+	while (sscanf(inBuff, "%s %s", new.FirstName, new.LastName) < 2) {
+                printf("Please enter employee's name in format \"First Last\": ");
+		fgets(inBuff, SIZE, stdin);
+	}
+	
+	printf("Enter employee's date of birth in the form Month Day Year: ");
+	fgets(inBuff, SIZE, stdin);
+	while(sscanf(inBuff, "%d %d %d", &new.DOB.Month, &new.DOB.Day, &new.DOB.Year) < 3 ||
+			 new.DOB.Month < 0 || new.DOB.Day < 0 || new.DOB.Year < -9999 ||
+			 new.DOB.Month > 12 || new.DOB.Day > 31 || new.DOB.Year > 9999) {
+		printf("Please enter valid employee's date of birth in format \"12 30 2020\": ");
+                fgets(inBuff, SIZE, stdin);
+	}
+
+	printf("Enter employee's salary: ");
+	fgets(inBuff, SIZE, stdin);
+	while(sscanf(inBuff, "%lf", &new.Salary) < 1) {
+		printf("Enter employee's salary in digit form: ");
+		fgets(inBuff, SIZE, stdin);
+	}
+	
+	*(*emps + size) = new;
+	return 1;
+}
+
+int update(char * inBuff, employee ** emps, int size) {
+	int ID, i, input;
+	
+	printf("\n**Update Employee Data**\n");
+
+	printf("Enter employee's ID: ");
+	fgets(inBuff, SIZE, stdin);
+	while(sscanf(inBuff, "%d", &ID) < 1){
+		printf("Please enter an Integer value for employee's ID: ");
+		fgets(inBuff, SIZE, stdin);
+	}
+
+	for(i = 0; i < size; i++) {
+		if (ID == (*(*emps + i)).ID) {
+			printEmployee((*(*emps + i)));
+			break;
+		}
+	}
+	if (i == size) {
+		printf("ID doesn't exist.\n");
+		return 0;
+	}
+	printf("Which data do you want to update?\n");
+	printf("\t1 - First Name\n");
+	printf("\t2 - Last Name\n");
+	printf("\t3 - DOB\n");
+	printf("\t4 - Salary\n");
+	printf("\t5 - Do not update\n");
+	
+	fgets(inBuff, SIZE, stdin);
+        while(sscanf(inBuff, "%d", &input) < 1 || input > 5 || input < 1){
+		printf("Option is not valid, try it again.\n");
+		fgets(inBuff, SIZE, stdin);
+	}
+	switch (input) {
+		case 1:
+			printf("Enter replacement first name: ");
+			fgets(inBuff, SIZE, stdin);
+			while (sscanf(inBuff, "%s", (*(*emps + i)).FirstName) < 1) {
+				printf("Please enter valid string for first name: ");
+				fgets(inBuff, SIZE, stdin);
+			}
+			break;
+		case 2:
+			printf("Enter replacement last name: ");
+			fgets(inBuff, SIZE, stdin);
+			while (sscanf(inBuff, "%s", (*(*emps + i)).LastName) < 1) {
+				printf("Please enter valid string for last name: ");
+				fgets(inBuff, SIZE, stdin);
+			}
+			break;
+		case 3:
+			printf("Enter replacement date of birth: ");
+                        fgets(inBuff, SIZE, stdin);
+                        while (sscanf(inBuff, "%d %d %d", &(*(*emps + i)).DOB.Month, &(*(*emps + i)).DOB.Day, 
+						&(*(*emps + i)).DOB.Year) < 3) {
+                                printf("Please enter replacement date of birth in format \"12 30 2020\": ");
+                                fgets(inBuff, SIZE, stdin);
+                        }
+			break;
+		case 4:
+			printf("Enter replacement salary: ");
+                        fgets(inBuff, SIZE, stdin);
+                        while (sscanf(inBuff, "%lf", &(*(*emps + i)).Salary) < 1) {
+                                printf("Enter replacement salary in digit form: ");
+                                fgets(inBuff, SIZE, stdin);
+                        }
+			break;
+		case 5:
+			return 1;
+		default:
+			printf("Error! input case out of bounds! (update())\n");
+	}
+	return 1;
+}
+
+int main() {
+	char inBuff[SIZE];
+	char input;
+	int N = 3, size = 0;
+	employee * employees;
+	employees = malloc(sizeof(employee) * N);
+	if (employees == NULL){
+		printf("Error! Memory allocation failed for employees array.\n");
+		return 1;
+	}
+	
+	/*menu*/
+	printf("Enter your Choice:\n");
+	printf("'i' - Insert data\n");
+	printf("'u' - Update data\n");
+	printf("'s' - Search employee\n");
+	printf("'p' - Print the database\n");
+	printf("'q' - Quit\n");
+	
+	printf("\nmenu choice: ");
+	fgets(inBuff, SIZE, stdin);
+	sscanf(inBuff, "%c", &input);
+
+	while(input != 'q' && input != 'Q') {
+		switch(input){
+			case 'i':
+			case 'I':
+				if(size == N) {
+					N *= 2;
+					employees = realloc(employees, sizeof(employee) * N);
+					if (employees == NULL){
+						printf("Error! Memory reallocation failed for employees array.\n");
+						return 1;
+					}
+				}
+				if (insert(inBuff, &employees, size)){
+					size++;
+				}
+				break;
+			case 'u':
+                        case 'U':
+				update(inBuff, &employees, size);
+                                break;
+			case 's':
+                        case 'S':
+                                search(inBuff, &employees, size);
+				break;
+			case 'p':
+                        case 'P':
+                                printData(employees, size);
+				break;
+			default:
+				printf("%c is not a valid choice\nPlease re-enter the choice.\n", input);
+				break;
+		}
+
+		printf("\nmenu choice: ");
+		fgets(inBuff, SIZE, stdin);
+        	sscanf(inBuff, "%c", &input);
+	}
+	free(employees);
+	return 0;
+}
+bash-4.4$ make clean
+rm lab9_srhoade_214
+bash-4.4$ make
+gcc lab9_srhoade_214.c -o lab9_srhoade_214 -g -Wall -std=c89 -pedantic-errors -lm
+bash-4.4$ ls
+lab9_srhoade_214  lab9_srhoade_214.c  lab9_typescript_srhoade_214  Makefile
+bash-4.4$ ./lab9_srhoade_214 
+Enter your Choice:
+'i' - Insert data
+'u' - Update data
+'s' - Search employee
+'p' - Print the database
+'q' - Quit
+
+menu choice: l
+l is not a valid choice
+Please re-enter the choice.
+
+menu choice: i
+
+**Insert Data For New Employee**
+Enter employee's ID: 1
+Enter employee's first and last name: First Peron  son
+Enter employee's date of birth in the form Month Day Year: 1 1 - 0
+Enter employee's salary: 10000000.00
+
+menu choice: I
+
+**Insert Data For New Employee**
+Enter employee's ID: 1
+Error! ID is already in the database.
+Returning to menu.
+
+menu choice: i
+
+**Insert Data For New Employee**
+Enter employee's ID: 2
+Enter employee's first and last name: Another Employee
+Enter employee's date of birth in the form Month Day Year: 6 6     5 5 1503
+Enter employee's salary: 1523  .23
+
+menu choice: i
+
+**Insert Data For New Employee**
+Enter employee's ID: 3 three
+Please enter an Integer value for employee's ID: 3
+Enter employee's first and last name: JohnSmith
+Please enter employee's name in format "First Last": John Smti  ith
+Enter employee's date of birth in the form Month Day Year: August 3rd 2002
+Please enter valid employee's date of birth in format "12 30 2020": 6 3 2002
+Enter employee's salary: 2 thog usand and 4
+
+menu choice: i
+
+**Insert Data For New Employee**
+Enter employee's ID: 4
+Enter employee's first and last name: Myself l rhoades s
+Enter employee's date of birth in the form Month Day Year: 8 6 1997
+Enter employee's salary: 222222 
+
+menu choice: I
+
+**Insert Data For New Employee**
+Enter employee's ID: 5
+Enter employee's first and last name: Tony Stark
+Enter employee's date of birth in the form Month Day Year: 12 30 2020
+Enter employee's salary: 2131564891.25
+
+menu choice: s
+
+**Search For Employee Data by ID**
+Enter employee's ID:12
+ID Not Found
+
+menu choice: s
+
+**Search For Employee Data by ID**
+Enter employee's ID:5
+*************************************************************
+	ID: 5
+	First Name: Tony
+	Last Name: Stark
+	DOB: 12/30/2020
+	Salary: 2131564891.25
+*************************************************************
+
+menu choice: i
+
+**Insert Data For New Employee**
+Enter employee's ID: 1568795453215684
+ID value must be positive and less than 2147483647: 12354  45
+Enter employee's first and last name: Steve Steveo  ia
+Enter employee's date of birth in the form Month Day Year: 12 25 666
+Enter employee's salary: 420
+
+menu choice: u U
+
+**Update Employee Data**
+Enter employee's ID: 12345
+*************************************************************
+	ID: 12345
+	First Name: Steve
+	Last Name: Stevia
+	DOB: 12/25/666
+	Salary: 420.00
+*************************************************************
+Which data do you want to update?
+	1 - First Name
+	2 - Last Name
+	3 - DOB
+	4 - Salary
+	5 - Do not update
+three
+Option is not valid, try it again.
+6
+Option is not valid, try it again.
+3
+Enter replacement date of birth: 6 6 6666
+
+menu choice: p
+*************************************************************
+	ID       Name                 DOB        Salary         
+	1        First Person         1/1/0      10000000.00    
+	2        Another Employee     5/5/1503   15.23          
+	3        John Smith           6/3/2002   2.00           
+	4        Myself rhoades       8/6/1997   22222.00       
+	5        Tony Stark           12/30/2020 2131564891.25  
+	12345    Steve Stevia         6/6/6666   420.00         
+*************************************************************
+
+menu choice: u
+
+**Update Employee Data**
+Enter employee's ID: 3
+*************************************************************
+	ID: 3
+	First Name: John
+	Last Name: Smith
+	DOB: 6/3/2002
+	Salary: 2.00
+*************************************************************
+Which data do you want to update?
+	1 - First Name
+	2 - Last Name
+	3 - DOB
+	4 - Salary
+	5 - Do not update
+4
+Enter replacement salary: 2004
+
+menu choice: p
+*************************************************************
+	ID       Name                 DOB        Salary         
+	1        First Person         1/1/0      10000000.00    
+	2        Another Employee     5/5/1503   15.23          
+	3        John Smith           6/3/2002   2004.00        
+	4        Myself rhoades       8/6/1997   22222.00       
+	5        Tony Stark           12/30/2020 2131564891.25  
+	12345    Steve Stevia         6/6/6666   420.00         
+*************************************************************
+
+menu choice: q
+bash-4.4$ make clean
+rm lab9_srhoade_214
+bash-4.4$ exit
+
+Script done on 2023-11-01 17:06:31-04:00

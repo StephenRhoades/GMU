@@ -1,0 +1,374 @@
+Script started on 2023-11-13 18:34:54-05:00
+bash-4.4$ um[Kname -a
+Linux zeus-2.cec.gmu.edu 4.18.0-348.23.1.el8_5.x86_64 #1 SMP Tue Apr 12 11:20:32 EDT 2022 x86_64 x86_64 x86_64 GNU/Linux
+bash-4.4$ pwd
+/home/srhoade/CS262/lab11_srhoade_214
+bash-4.4$ ls
+lab11_srhoade_214.c  lab11_typescript_srhoade_214  Makefile
+bash-4.4$ cat lab11_a[Ksrhoade_214.c 
+/* Stephen Rhoades G01369048
+ * CS 262, Lab Section 214
+ * Lab11: Bitwise Operators
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#define SIZE 50
+#define BYTETOBINARYPATTERN "%d%d%d%d%d%d%d%d" 
+#define BYTETOBINARY(byte) \
+	(byte & 0x80 ? 1 : 0), \
+	(byte & 0x40 ? 1 : 0), \
+	(byte & 0x20 ? 1 : 0), \
+	(byte & 0x10 ? 1 : 0), \
+	(byte & 0x08 ? 1 : 0), \
+	(byte & 0x04 ? 1 : 0), \
+	(byte & 0x02 ? 1 : 0), \
+	(byte & 0x01 ? 1 : 0)
+#define PRINTBIN(x) printf(BYTETOBINARYPATTERN, BYTETOBINARY(x));
+
+
+void setlsbs(unsigned char *p, unsigned char b0){
+	int i,x, sub;
+	unsigned char temp = 0;
+	for (i = 0; i < 8; i ++){
+		sub = 1;
+		for (x = 0; x < i; x ++ ){
+			sub *= 2;
+		}	
+		temp = b0 & sub;
+		if (temp == 0){
+			p[i] = p[i] & 0xFE;
+		} else {
+			p[i] = p[i] | 0x01;
+		}
+	}
+}
+
+unsigned char getlsbs(unsigned char *p){
+	int i = 0;
+	unsigned char lsb, b0 = 0;
+	for (i = 0; i < 8; i ++){
+		lsb = *(p+i) & 1;
+		lsb = lsb << i;
+		b0 = b0 | lsb;
+	}
+
+	return b0;
+}
+
+int main(int argc,char *argv[]){
+	unsigned char *p; 
+	unsigned char byte0;
+	int i = 0, seed = 0;
+	p = malloc(8);
+	
+	if (argc <= 1) {
+		printf("Need a command line argument!\n");
+		return 0;
+	}
+	if (sscanf(argv[1], "%d", &seed) < 1) {
+		printf("Please enter an integer value for the command line argument!\n");
+		return 0;
+	}
+	srand((unsigned)seed);
+
+	for (i = 0; i < 8; i++ ){
+		*(p+i) = rand()%256;
+	}
+	byte0 = rand()%256;
+	
+	printf("p values:\n");
+	for (i = 0; i < 8; i++){
+		printf("decimal: %d, binary: ", *(p+i));
+		PRINTBIN(*(p+i)); printf("\n");
+	}
+	printf("\n");
+
+	printf("byte0 value:\n");
+	printf("decimal: %d, binary: ", byte0);
+	PRINTBIN(byte0); printf("\n\n");
+	
+	setlsbs(p, byte0);
+	printf("modified p values:\n");
+        for (i = 0; i < 8; i++){
+		printf("decimal: %d, binary: ", *(p+i));
+		PRINTBIN(*(p+i)); printf("\n");
+	}
+	printf("\n");
+	
+	byte0 = getlsbs(p);
+	
+	printf("returned byte0 value:\n");
+	printf("decimal: %d, binary: ", byte0);
+	PRINTBIN(byte0); printf("\n");
+
+	free(p);
+	return 1;
+}
+bash-4.4$ make
+gcc lab11_srhoade_214.c -o lab11_srhoade_214 -g -Wall -std=c89 -pedantic-errors -lm
+bash-4.4$ ./lab11_srhoade_214 12
+p values:
+decimal: 208, binary: 11010000
+decimal: 146, binary: 10010010
+decimal: 178, binary: 10110010
+decimal: 192, binary: 11000000
+decimal: 59, binary: 00111011
+decimal: 247, binary: 11110111
+decimal: 133, binary: 10000101
+decimal: 153, binary: 10011001
+
+byte0 value:
+decimal: 129, binary: 10000001
+
+modified p values:
+decimal: 209, binary: 11010001
+decimal: 146, binary: 10010010
+decimal: 178, binary: 10110010
+decimal: 192, binary: 11000000
+decimal: 58, binary: 00111010
+decimal: 246, binary: 11110110
+decimal: 132, binary: 10000100
+decimal: 153, binary: 10011001
+
+returned byte0 value:
+decimal: 129, binary: 10000001
+bash-4.4$ ./lab11_srhoade_214 12654
+p values:
+decimal: 54, binary: 00110110
+decimal: 43, binary: 00101011
+decimal: 15, binary: 00001111
+decimal: 54, binary: 00110110
+decimal: 150, binary: 10010110
+decimal: 37, binary: 00100101
+decimal: 54, binary: 00110110
+decimal: 139, binary: 10001011
+
+byte0 value:
+decimal: 19, binary: 00010011
+
+modified p values:
+decimal: 55, binary: 00110111
+decimal: 43, binary: 00101011
+decimal: 14, binary: 00001110
+decimal: 54, binary: 00110110
+decimal: 151, binary: 10010111
+decimal: 36, binary: 00100100
+decimal: 54, binary: 00110110
+decimal: 138, binary: 10001010
+
+returned byte0 value:
+decimal: 19, binary: 00010011
+bash-4.4$ ./lab11_srhoade_214 12654[K[K[K[K[K3578
+p values:
+decimal: 12, binary: 00001100
+decimal: 212, binary: 11010100
+decimal: 85, binary: 01010101
+decimal: 136, binary: 10001000
+decimal: 52, binary: 00110100
+decimal: 55, binary: 00110111
+decimal: 157, binary: 10011101
+decimal: 82, binary: 01010010
+
+byte0 value:
+decimal: 109, binary: 01101101
+
+modified p values:
+decimal: 13, binary: 00001101
+decimal: 212, binary: 11010100
+decimal: 85, binary: 01010101
+decimal: 137, binary: 10001001
+decimal: 52, binary: 00110100
+decimal: 55, binary: 00110111
+decimal: 157, binary: 10011101
+decimal: 82, binary: 01010010
+
+returned byte0 value:
+decimal: 109, binary: 01101101
+bash-4.4$ ./lab11_srhoade_214 3578[K[K
+p values:
+decimal: 136, binary: 10001000
+decimal: 143, binary: 10001111
+decimal: 249, binary: 11111001
+decimal: 12, binary: 00001100
+decimal: 131, binary: 10000011
+decimal: 113, binary: 01110001
+decimal: 174, binary: 10101110
+decimal: 15, binary: 00001111
+
+byte0 value:
+decimal: 89, binary: 01011001
+
+modified p values:
+decimal: 137, binary: 10001001
+decimal: 142, binary: 10001110
+decimal: 248, binary: 11111000
+decimal: 13, binary: 00001101
+decimal: 131, binary: 10000011
+decimal: 112, binary: 01110000
+decimal: 175, binary: 10101111
+decimal: 14, binary: 00001110
+
+returned byte0 value:
+decimal: 89, binary: 01011001
+bash-4.4$ ./lab11_srhoade_214 35[K[K12312132
+p values:
+decimal: 217, binary: 11011001
+decimal: 29, binary: 00011101
+decimal: 183, binary: 10110111
+decimal: 89, binary: 01011001
+decimal: 187, binary: 10111011
+decimal: 127, binary: 01111111
+decimal: 225, binary: 11100001
+decimal: 103, binary: 01100111
+
+byte0 value:
+decimal: 168, binary: 10101000
+
+modified p values:
+decimal: 216, binary: 11011000
+decimal: 28, binary: 00011100
+decimal: 182, binary: 10110110
+decimal: 89, binary: 01011001
+decimal: 186, binary: 10111010
+decimal: 127, binary: 01111111
+decimal: 224, binary: 11100000
+decimal: 103, binary: 01100111
+
+returned byte0 value:
+decimal: 168, binary: 10101000
+bash-4.4$ ./lab11_srhoade_214 12312132[K[K[K[K[K[K[K11111
+p values:
+decimal: 232, binary: 11101000
+decimal: 228, binary: 11100100
+decimal: 251, binary: 11111011
+decimal: 179, binary: 10110011
+decimal: 14, binary: 00001110
+decimal: 158, binary: 10011110
+decimal: 210, binary: 11010010
+decimal: 211, binary: 11010011
+
+byte0 value:
+decimal: 248, binary: 11111000
+
+modified p values:
+decimal: 232, binary: 11101000
+decimal: 228, binary: 11100100
+decimal: 250, binary: 11111010
+decimal: 179, binary: 10110011
+decimal: 15, binary: 00001111
+decimal: 159, binary: 10011111
+decimal: 211, binary: 11010011
+decimal: 211, binary: 11010011
+
+returned byte0 value:
+decimal: 248, binary: 11111000
+bash-4.4$ ./lab11_srhoade_214 111111[K[K[K[K[K[K084945
+p values:
+decimal: 216, binary: 11011000
+decimal: 97, binary: 01100001
+decimal: 4, binary: 00000100
+decimal: 58, binary: 00111010
+decimal: 202, binary: 11001010
+decimal: 194, binary: 11000010
+decimal: 41, binary: 00101001
+decimal: 47, binary: 00101111
+
+byte0 value:
+decimal: 82, binary: 01010010
+
+modified p values:
+decimal: 216, binary: 11011000
+decimal: 97, binary: 01100001
+decimal: 4, binary: 00000100
+decimal: 58, binary: 00111010
+decimal: 203, binary: 11001011
+decimal: 194, binary: 11000010
+decimal: 41, binary: 00101001
+decimal: 46, binary: 00101110
+
+returned byte0 value:
+decimal: 82, binary: 01010010
+bash-4.4$ ./lab11_srhoade_214 084945[K[K[K[K[K[K387894
+p values:
+decimal: 25, binary: 00011001
+decimal: 166, binary: 10100110
+decimal: 75, binary: 01001011
+decimal: 136, binary: 10001000
+decimal: 254, binary: 11111110
+decimal: 30, binary: 00011110
+decimal: 131, binary: 10000011
+decimal: 152, binary: 10011000
+
+byte0 value:
+decimal: 184, binary: 10111000
+
+modified p values:
+decimal: 24, binary: 00011000
+decimal: 166, binary: 10100110
+decimal: 74, binary: 01001010
+decimal: 137, binary: 10001001
+decimal: 255, binary: 11111111
+decimal: 31, binary: 00011111
+decimal: 130, binary: 10000010
+decimal: 153, binary: 10011001
+
+returned byte0 value:
+decimal: 184, binary: 10111000
+bash-4.4$ ./lab11_srhoade_214 387894[K[K[K84941
+p values:
+decimal: 45, binary: 00101101
+decimal: 10, binary: 00001010
+decimal: 89, binary: 01011001
+decimal: 228, binary: 11100100
+decimal: 137, binary: 10001001
+decimal: 49, binary: 00110001
+decimal: 190, binary: 10111110
+decimal: 54, binary: 00110110
+
+byte0 value:
+decimal: 25, binary: 00011001
+
+modified p values:
+decimal: 45, binary: 00101101
+decimal: 10, binary: 00001010
+decimal: 88, binary: 01011000
+decimal: 229, binary: 11100101
+decimal: 137, binary: 10001001
+decimal: 48, binary: 00110000
+decimal: 190, binary: 10111110
+decimal: 54, binary: 00110110
+
+returned byte0 value:
+decimal: 25, binary: 00011001
+bash-4.4$ ./lab11_srhoade_214 38784941[K[K[K[K[K[K[K[K2345654
+p values:
+decimal: 30, binary: 00011110
+decimal: 62, binary: 00111110
+decimal: 217, binary: 11011001
+decimal: 186, binary: 10111010
+decimal: 105, binary: 01101001
+decimal: 188, binary: 10111100
+decimal: 65, binary: 01000001
+decimal: 182, binary: 10110110
+
+byte0 value:
+decimal: 15, binary: 00001111
+
+modified p values:
+decimal: 31, binary: 00011111
+decimal: 63, binary: 00111111
+decimal: 217, binary: 11011001
+decimal: 187, binary: 10111011
+decimal: 104, binary: 01101000
+decimal: 188, binary: 10111100
+decimal: 64, binary: 01000000
+decimal: 182, binary: 10110110
+
+returned byte0 value:
+decimal: 15, binary: 00001111
+bash-4.4$ [Kbash-4.4$ ./lab11_srhoade_214 2345654[Kbash-4.4$ ./lab11_srhoade_214 2345654[C[C[C[C[C[C[C[C[C[C[Kmake clean
+rm lab11_srhoade_214
+bash-4.4$ exit
+
+Script done on 2023-11-13 18:36:34-05:00
