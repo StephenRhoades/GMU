@@ -1,0 +1,10 @@
+6 2
+Bulma 0 513
+Frieza 2 675
+Yamcha 2 700
+Vegeta 1 335
+Piccolo 1 305
+Goku 0 765
+0 353
+0 65
+0 0
